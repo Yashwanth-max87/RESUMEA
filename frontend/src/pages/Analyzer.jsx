@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { UploadCloud, Wand2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import TopNav from '../components/TopNav.jsx';
@@ -14,14 +15,20 @@ export default function Analyzer() {
 
   const handleAnalyze = async (event) => {
     event.preventDefault();
-    setLoading(true);
     const file = event.currentTarget.resume.files?.[0];
+    if (!file) {
+      toast.error('Upload a resume PDF first so the analyzer can extract your real skills.');
+      return;
+    }
+    setLoading(true);
     const formData = new FormData();
     formData.append('role', role);
-    if (file) formData.append('file', file);
+    formData.append('file', file);
     try {
       const result = await analyzeResume(formData);
       setAnalysis(result);
+      localStorage.setItem('lastAnalysis', JSON.stringify(result));
+      localStorage.setItem('roadmapMissingSkills', JSON.stringify(result.missingSkills || []));
       toast.success('AI analysis complete');
     } catch (error) {
       toast.error(error.response?.status === 403 ? 'Please clear the old demo token or login again.' : 'AI analysis failed. Check the backend and AI service.');
@@ -65,6 +72,9 @@ export default function Analyzer() {
           <div className="rounded-md border border-line bg-panel2 p-5">
             <h2 className="font-bold">Missing skills</h2>
             <div className="mt-3 flex flex-wrap gap-2">{analysis.missingSkills.map((skill) => <span key={skill} className="rounded-md bg-coral/10 px-3 py-1 text-sm text-rose-200">{skill}</span>)}</div>
+            {analysis.missingSkills.length > 0 && (
+              <Link className="btn-primary mt-4" to="/roadmap">Create roadmap from these missing skills</Link>
+            )}
           </div>
           <div className="rounded-md border border-line bg-panel2 p-5">
             <h2 className="font-bold">Matched skills</h2>
@@ -80,6 +90,12 @@ export default function Analyzer() {
               <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-300">{analysis.interviewTopics.map((item) => <li key={item}>{item}</li>)}</ul>
             </div>
           </div>
+          {analysis.resumeFixes?.length > 0 && (
+            <div className="rounded-md border border-line bg-panel2 p-5">
+              <h2 className="font-bold">Resume fixes for missing skills</h2>
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-300">{analysis.resumeFixes.map((item) => <li key={item}>{item}</li>)}</ul>
+            </div>
+          )}
         </section>
       </main>
     </div>

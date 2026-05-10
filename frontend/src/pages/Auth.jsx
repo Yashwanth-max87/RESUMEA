@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { Github, Mail } from 'lucide-react';
 import toast from 'react-hot-toast';
 import TopNav from '../components/TopNav.jsx';
@@ -9,9 +10,19 @@ export default function Auth({ mode }) {
   const navigate = useNavigate();
   const isRegister = mode === 'register';
   const isForgot = mode === 'forgot';
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('token') === 'demo-token') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      toast('Old demo session cleared. Please login again.');
+    }
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setSubmitting(true);
     const form = new FormData(event.currentTarget);
     const payload = Object.fromEntries(form.entries());
     try {
@@ -29,8 +40,12 @@ export default function Auth({ mode }) {
     } catch (error) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      const message = error.response?.data?.message || 'Authentication failed. Check the backend and your credentials.';
+      const message = error.response?.status === 400 || error.response?.status === 409
+        ? 'This email may already be registered. Try login, or use another email.'
+        : error.response?.data?.message || 'Authentication failed. Check the backend and your credentials.';
       toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -63,7 +78,7 @@ export default function Auth({ mode }) {
                 <input className="field mt-2" name="password" type="password" required />
               </label>
             )}
-            <button className="btn-primary w-full" type="submit"><Mail size={16} /> {isForgot ? 'Send reset link' : isRegister ? 'Create account' : 'Login'}</button>
+            <button className="btn-primary w-full" type="submit" disabled={submitting}><Mail size={16} /> {submitting ? 'Please wait...' : isForgot ? 'Send reset link' : isRegister ? 'Create account' : 'Login'}</button>
             {!isForgot && (
               <div className="grid gap-2 sm:grid-cols-2">
                 <a className="btn-secondary" href="http://localhost:8080/oauth2/authorization/google">Google OAuth</a>

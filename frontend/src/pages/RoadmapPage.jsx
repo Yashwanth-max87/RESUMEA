@@ -4,7 +4,10 @@ import TopNav from '../components/TopNav.jsx';
 import { generateRoadmap, roleCatalog } from '../data/roles.js';
 
 export default function RoadmapPage() {
-  const [skills, setSkills] = useState('Docker\nCI/CD\nCloud Deployment\nTesting');
+  const [skills, setSkills] = useState(() => {
+    const stored = JSON.parse(localStorage.getItem('roadmapMissingSkills') || '[]');
+    return stored.length ? stored.join('\n') : '';
+  });
   const roadmap = useMemo(() => generateRoadmap(skills.split('\n').map((item) => item.trim()).filter(Boolean)), [skills]);
 
   return (
@@ -15,7 +18,7 @@ export default function RoadmapPage() {
           <section className="rounded-md border border-line bg-panel2 p-5">
             <p className="section-title">Skill Roadmap</p>
             <h1 className="mt-2 text-3xl font-black">Turn missing skills into a plan</h1>
-            <p className="mt-3 leading-7 text-slate-400">Paste missing skills from the analyzer or choose a role. Each skill becomes a beginner to advanced roadmap with YouTube searches, practice ideas, and estimated duration.</p>
+            <p className="mt-3 leading-7 text-slate-400">Run the AI analyzer first and this page will use the exact missing skills from that resume. You can also paste skills manually or choose a role below.</p>
             <label className="mt-5 block">
               <span className="section-title">Missing skills</span>
               <textarea className="field mt-2 min-h-44" value={skills} onChange={(event) => setSkills(event.target.value)} />
@@ -25,6 +28,7 @@ export default function RoadmapPage() {
                 <button key={role} className="btn-secondary" onClick={() => setSkills(required.slice(4, 8).join('\n'))}>{role}</button>
               ))}
             </div>
+            {!skills.trim() && <p className="mt-4 rounded-md bg-amber/10 p-3 text-sm text-amber">No analyzer skills found yet. Upload a resume in AI Analyzer, or choose a role above.</p>}
           </section>
           <section className="rounded-md border border-line bg-panel2 p-5">
             <div className="mb-4 flex items-center gap-2">
@@ -32,6 +36,7 @@ export default function RoadmapPage() {
               <h2 className="text-xl font-bold">Generated roadmap</h2>
             </div>
             <div className="space-y-4">
+              {roadmap.length === 0 && <div className="rounded-md border border-line bg-ink/45 p-4 text-slate-400">Roadmap will appear after missing skills are added.</div>}
               {roadmap.map((item) => (
                 <article key={item.skill} className="rounded-md border border-line bg-ink/45 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
@@ -63,4 +68,3 @@ export default function RoadmapPage() {
     </div>
   );
 }
-

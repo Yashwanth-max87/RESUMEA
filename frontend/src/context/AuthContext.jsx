@@ -4,7 +4,15 @@ import { api } from '../services/api.js';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [token, setToken] = useState(() => {
+    const stored = localStorage.getItem('token');
+    if (stored === 'demo-token') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return null;
+    }
+    return stored;
+  });
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || 'null'));
 
   const value = useMemo(() => ({
@@ -13,6 +21,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: Boolean(token),
     async login(payload) {
       const { data } = await api.post('/auth/login', payload);
+      localStorage.removeItem('activeResume');
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setToken(data.token);
@@ -21,6 +30,7 @@ export function AuthProvider({ children }) {
     },
     async register(payload) {
       const { data } = await api.post('/auth/register', payload);
+      localStorage.removeItem('activeResume');
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setToken(data.token);
@@ -41,4 +51,3 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
-

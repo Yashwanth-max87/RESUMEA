@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "vscjava.vscode-java-pack",
+    "ms-python.python",
+    "ms-azuretools.vscode-docker"
+  ]
+}
+

@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: smart-resume-backend
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:smartresume;DB_CLOSE_DELAY=-1;MODE=PostgreSQL}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+app:
+  jwt-secret: ${APP_JWT_SECRET:change-me-to-a-long-random-secret-change-me}
+  jwt-expiration-minutes: 720
+  ai-service-url: ${APP_AI_SERVICE_URL:http://localhost:8000}
+  cors-origin: ${APP_CORS_ORIGIN:http://localhost:5173}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

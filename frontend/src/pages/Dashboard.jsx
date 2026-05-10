@@ -1,9 +1,21 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart3, Clock, FilePlus2, Gauge, MoreHorizontal } from 'lucide-react';
+import toast from 'react-hot-toast';
 import TopNav from '../components/TopNav.jsx';
-import { savedResumes } from '../data/resume.js';
+import { api } from '../services/api.js';
 
 export default function Dashboard() {
+  const [resumes, setResumes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/resumes')
+      .then(({ data }) => setResumes(data))
+      .catch(() => toast.error('Login required to load saved resumes.'))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="app-shell">
       <TopNav />
@@ -18,20 +30,22 @@ export default function Dashboard() {
         <div className="mb-8 grid gap-4 md:grid-cols-3">
           <div className="rounded-md border border-line bg-panel2 p-5"><Gauge className="text-mint" /><p className="mt-4 text-3xl font-black">88</p><p className="text-sm text-slate-400">Best ATS score</p></div>
           <div className="rounded-md border border-line bg-panel2 p-5"><BarChart3 className="text-amber" /><p className="mt-4 text-3xl font-black">+12%</p><p className="text-sm text-slate-400">Score improvement</p></div>
-          <div className="rounded-md border border-line bg-panel2 p-5"><Clock className="text-coral" /><p className="mt-4 text-3xl font-black">3</p><p className="text-sm text-slate-400">Saved resumes</p></div>
+          <div className="rounded-md border border-line bg-panel2 p-5"><Clock className="text-coral" /><p className="mt-4 text-3xl font-black">{resumes.length}</p><p className="text-sm text-slate-400">Saved resumes</p></div>
         </div>
         <section className="rounded-md border border-line bg-panel2">
           <div className="border-b border-line p-4">
             <h2 className="font-bold">Saved resumes</h2>
           </div>
           <div className="divide-y divide-line">
-            {savedResumes.map((resume) => (
+            {loading && <div className="p-4 text-sm text-slate-400">Loading resumes...</div>}
+            {!loading && resumes.length === 0 && <div className="p-4 text-sm text-slate-400">No saved resumes yet. Create one and press Save.</div>}
+            {resumes.map((resume) => (
               <div key={resume.id} className="grid gap-4 p-4 md:grid-cols-[1fr_auto_auto_auto] md:items-center">
                 <div>
                   <h3 className="font-semibold">{resume.title}</h3>
-                  <p className="text-sm text-slate-400">{resume.template} · Updated {resume.updatedAt}</p>
+                  <p className="text-sm text-slate-400">{resume.templateId} · Updated {new Date(resume.updatedAt).toLocaleString()}</p>
                 </div>
-                <span className="rounded-md bg-mint/10 px-3 py-1 text-sm font-semibold text-mint">ATS {resume.ats}</span>
+                <span className="rounded-md bg-mint/10 px-3 py-1 text-sm font-semibold text-mint">Saved</span>
                 <Link className="btn-secondary" to={`/builder/${resume.id}`}>Open</Link>
                 <button className="icon-btn" title="More actions"><MoreHorizontal size={16} /></button>
               </div>

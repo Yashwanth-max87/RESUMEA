@@ -25,6 +25,11 @@ public class ResumeService {
     return resumeRepository.findByUserOrderByUpdatedAtDesc(user).stream().map(this::toResponse).toList();
   }
 
+  public ResumeResponse get(User user, UUID id) {
+    Resume resume = resumeRepository.findById(id).filter(item -> item.getUser().getId().equals(user.getId())).orElseThrow();
+    return toResponse(resume);
+  }
+
   public ResumeResponse create(User user, ResumeRequest request) {
     Resume resume = new Resume();
     resume.setUser(user);
@@ -66,4 +71,3 @@ public class ResumeService {
     return title == null ? "resume" : title.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", "-").replaceAll("(^-|-$)", "");
   }
 }
-

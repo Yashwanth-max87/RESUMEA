@@ -13,11 +13,22 @@ function ListSection({ title, children }) {
 export default function ResumePreview({ resume, scale = 'normal' }) {
   const style = { '--accent': resume.theme.color };
   const sizeClass = scale === 'small' ? 'w-[360px] min-h-[510px] text-[9px]' : 'w-full max-w-[860px] min-h-[1120px] text-[13px]';
+  const isAtlas = resume.template === 'atlas';
+  const isCompact = resume.template === 'compact';
+  const isExecutive = resume.template === 'executive';
+  const isSignal = resume.template === 'signal';
 
   return (
-    <article id="resume-preview" className={`resume-paper mx-auto p-8 ${sizeClass}`} style={style}>
-      <div className={resume.template === 'atlas' ? 'grid grid-cols-[1fr_2fr] gap-7' : 'space-y-5'}>
-        <aside className={resume.template === 'atlas' ? 'border-r pr-5' : ''} style={{ borderColor: '#d1d5db' }}>
+    <article id="resume-preview" className={`resume-paper mx-auto ${isCompact ? 'p-6' : 'p-8'} ${isExecutive ? 'font-serif' : ''} ${sizeClass}`} style={style}>
+      {isSignal && (
+        <div className="mb-6 border-b-4 pb-5" style={{ borderColor: 'var(--accent)' }}>
+          <h1 className="text-4xl font-black leading-tight" style={{ color: 'var(--accent)' }}>{resume.basics.name}</h1>
+          <p className="mt-1 text-base font-semibold text-slate-700">{resume.basics.headline}</p>
+          <p className="mt-2 text-[12px] text-slate-600">{resume.basics.email} · {resume.basics.phone} · {resume.basics.location} · {resume.basics.website}</p>
+        </div>
+      )}
+      <div className={isAtlas ? 'grid grid-cols-[1fr_2fr] gap-7' : isExecutive ? 'grid grid-cols-[2fr_0.8fr] gap-7' : 'space-y-5'}>
+        <aside className={isAtlas ? 'border-r pr-5' : isExecutive ? 'order-2 border-l pl-5' : isSignal ? 'hidden' : ''} style={{ borderColor: '#d1d5db' }}>
           <div className="mb-5">
             {resume.basics.image ? (
               <img alt="" src={resume.basics.image} className="mb-4 h-20 w-20 rounded-full object-cover" />
@@ -26,8 +37,12 @@ export default function ResumePreview({ resume, scale = 'normal' }) {
                 {resume.basics.name.split(' ').map((part) => part[0]).join('').slice(0, 2)}
               </div>
             )}
-            <h1 className="text-3xl font-black leading-tight" style={{ color: 'var(--accent)' }}>{resume.basics.name}</h1>
-            <p className="mt-1 text-sm font-semibold text-slate-700">{resume.basics.headline}</p>
+            {!isSignal && (
+              <>
+                <h1 className={`${isExecutive ? 'text-4xl' : 'text-3xl'} font-black leading-tight`} style={{ color: 'var(--accent)' }}>{resume.basics.name}</h1>
+                <p className="mt-1 text-sm font-semibold text-slate-700">{resume.basics.headline}</p>
+              </>
+            )}
           </div>
           <div className="mb-5 space-y-2 text-[12px] text-slate-700">
             <p className="flex items-center gap-2"><Mail size={12} /> {resume.basics.email}</p>
@@ -47,7 +62,7 @@ export default function ResumePreview({ resume, scale = 'normal' }) {
             <ul className="space-y-1 text-slate-700">{resume.certifications.map((item) => <li key={item}>{item}</li>)}</ul>
           </ListSection>
         </aside>
-        <main>
+        <main className={isExecutive ? 'order-1' : ''}>
           <ListSection title="Summary">
             <p className="leading-relaxed text-slate-700">{resume.summary}</p>
           </ListSection>
@@ -96,4 +111,3 @@ export default function ResumePreview({ resume, scale = 'normal' }) {
     </article>
   );
 }
-

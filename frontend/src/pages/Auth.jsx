@@ -26,11 +26,11 @@ export default function Auth({ mode }) {
         toast.success('Welcome back');
         navigate('/dashboard');
       }
-    } catch {
-      toast.error('Backend not running yet. Demo mode keeps the UI available.');
-      localStorage.setItem('token', 'demo-token');
-      localStorage.setItem('user', JSON.stringify({ name: payload.name || 'Demo User', email: payload.email }));
-      navigate('/dashboard');
+    } catch (error) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      const message = error.response?.data?.message || 'Authentication failed. Check the backend and your credentials.';
+      toast.error(message);
     }
   };
 
@@ -80,4 +80,3 @@ export default function Auth({ mode }) {
     </div>
   );
 }
-

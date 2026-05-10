@@ -31,6 +31,11 @@ public class ResumeController {
     return resumeService.list(currentUserService.currentUser());
   }
 
+  @GetMapping("/{id}")
+  public ResumeResponse get(@PathVariable UUID id) {
+    return resumeService.get(currentUserService.currentUser(), id);
+  }
+
   @PostMapping
   public ResumeResponse create(@RequestBody ResumeRequest request) {
     return resumeService.create(currentUserService.currentUser(), request);
@@ -46,4 +51,3 @@ public class ResumeController {
     resumeService.delete(currentUserService.currentUser(), id);
   }
 }
-

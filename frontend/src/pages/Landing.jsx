@@ -4,6 +4,7 @@ import { ArrowRight, BrainCircuit, FileDown, Lock, Route, ShieldCheck, Sparkles 
 import TopNav from '../components/TopNav.jsx';
 import ResumePreview from '../components/ResumePreview.jsx';
 import { defaultResume, templates } from '../data/resume.js';
+import { TemplateMiniature } from '../utils/templatePreview.jsx';
 
 const features = [
   { icon: BrainCircuit, title: 'AI resume analysis', text: 'Extract skills, score ATS fit, and improve weak bullets.' },
@@ -64,15 +65,7 @@ export default function Landing() {
           <div className="grid gap-4 md:grid-cols-4">
             {templates.map((template) => (
               <div key={template.id} className="rounded-md border border-line bg-panel2 p-4">
-                <div className="mb-4 h-40 rounded-md bg-white p-4">
-                  <div className="h-5 w-2/3 rounded-sm bg-slate-900" />
-                  <div className="mt-4 h-2 w-full rounded-sm bg-slate-200" />
-                  <div className="mt-2 h-2 w-5/6 rounded-sm bg-slate-200" />
-                  <div className="mt-6 grid grid-cols-[0.35fr_1fr] gap-3">
-                    <div className="space-y-2">{Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-2 rounded-sm bg-teal-700/70" />)}</div>
-                    <div className="space-y-2">{Array.from({ length: 7 }).map((_, index) => <div key={index} className="h-2 rounded-sm bg-slate-300" />)}</div>
-                  </div>
-                </div>
+                <div className="mb-4"><TemplateMiniature templateId={template.id} compact /></div>
                 <h3 className="font-semibold">{template.name}</h3>
                 <p className="mt-1 text-sm text-slate-400">{template.description}</p>
               </div>
@@ -94,4 +87,3 @@ export default function Landing() {
     </div>
   );
 }
-

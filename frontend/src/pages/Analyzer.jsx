@@ -23,9 +23,8 @@ export default function Analyzer() {
       const result = await analyzeResume(formData);
       setAnalysis(result);
       toast.success('AI analysis complete');
-    } catch {
-      setAnalysis(buildLocalAnalysis(defaultResume, role));
-      toast.success('Demo analysis generated');
+    } catch (error) {
+      toast.error(error.response?.status === 403 ? 'Please clear the old demo token or login again.' : 'AI analysis failed. Check the backend and AI service.');
     } finally {
       setLoading(false);
     }
@@ -86,4 +85,3 @@ export default function Analyzer() {
     </div>
   );
 }
-
